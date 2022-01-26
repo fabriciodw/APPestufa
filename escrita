@@ -1,0 +1,132 @@
+"start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "dev": "nodemon src/server.js"
+
+
+bd no heroku
+    mysql:
+    b28c1ccf06caed
+    de192449
+    eu-cdbr-west-01.cleardb.com
+    heroku_f8ee480a8e0912e
+
+  
+  comando para verificar o node
+    heroku logs --app appteste-fabricio --tail
+
+
+-------------------------------Usar digital ocean ----------------------------
+ - criar uma nova droplet e usar o ubunto. adiconar ssh para melhor segurança.
+ - para logar utiliza o cmd em mode adiministrador. usando : ssh root@"ip da droplet". selecionar yes na parte seguinte
+ - adiconar novo usuário somente para lidar com o deploy. usar comando adduser deploy
+        senha do user deploy: 5f3c89dc8l25
+        para logar como deploy usar: su deploy
+        para sair do usuario usar: exit
+        dar permições para o usuario: usermod -aG sudo deploy
+
+        para conseguir utilizar o usuario, adicionar a chave ssh para ele tambem.
+            usando o usuario root, navegar ate a home: cd /home/
+            verificar se há uma pasta com nome deploy. acessar a pasta: cd deploy.
+            criar uma pasta chamada ssh dentro da pasta deploy: mkdir .ssh.
+            abrir a pasta .ssh, e dentro dela copiar a chave do usuario root: cp ~/.ssh/authorized_keys /home/deplou/.ssh/
+            verificar se a pasta authorized_keys esta dentro de /home/deploy/.ssh: ls 
+            dar permissões necessárias para o user deploy: chmod 600 authorized_keys
+            voltar uma pasta: cd ..
+            para a pasta ssh dar a permissão: chmod 700 .ssh/
+            colocar permissões no arquivo .ssh: chown -R deploy:deploy .ssh/
+            sair do usuario root e testar logar com user deploy.
+    
+    realizar atualizações no servidor
+        logar como root.
+        usar comando: apt update
+        apos termino usar: apt upgrade
+
+        ir ao site node. em versão LTS ir em other donwload, depois encontrar Installing Node.js via package manager, depois Debian and Ubuntu based Linux distributions, depois Node.js binary distributions e por fim encontrar a ultima versão LTS.
+            hoje é 16, copiar o codigo para ubunto: curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            e depois:                               sudo apt-get install -y nodejs
+            para verificar se o node esta instalado usar o node -v
+        
+        instalar o docker
+            para isntalar o docker: apt install docker.io
+            para verificar infos; docker ps
+            dar permissão ao user deploy para usar o docker: usermod -aG docker deploy
+            logar como deploy: su deploy
+            criar BD: docker run --name database -e MYSQL_ROOT_PASSWORD=5f3c89dc8l25 -p 3306:3306 --restart always -d mysql
+
+        usuario para BD mysql
+            criar user: docker exec -it database bash
+            executar: mysql -uroot -p {colocar senha 5f3c89dc8l25}
+            criar BD: CREATE DATABASE nodedeploy;
+            criar user: CREATE USER fabricio IDENTIFIED BY 'tocopheryl10';            
+            permissões: GRANT ALL PRIVILEGES ON nodedeploy.* TO fabricio;
+
+        subir projeto, configurar potas no node.
+            criar uma pasta. abrir no cmd a pasta criada. ir ate o github. pegar o ssh ou http e  clonar: git clone "https...."
+            criar um arquivo .env no diretorio proncipal e adiconar: 
+                                NODE_ENV=development
+                                PORT=3333
+
+                                DB_HOST=localhost
+                                DB_USER=docker
+                                DB_NAME:applied
+                                DB_PASS=docker
+            
+            dentro de server.js: require('dotenv/config') - colocar antes de todo o codigo
+                                 app.listen(process.env.PORT || 3333);
+
+            dentro de config/database:
+                                require('dotenv/config') - colocar antes de todo o codigo 
+                                host: process.env.DB_HOST,
+                                username: process.env.DB_USER,
+                                database: process.env.DB_NAME,
+                                password: process.env.DB_PASS,
+
+            instalar o dotenv: npm install dotenv
+
+            colocar o .env em gitignore e criar um .env.axamplo com os dados do .env
+
+            criar um novo projeto no github:
+                                git remote add deploy " chave https ..."
+                                git add .
+                                git commit -m "nome"
+                                git push deploy master
+            
+            ir para servidor
+                copiar o link da pagina https://github.com/fabriciodw/testeOcean
+                logar como deploy e criar uma pasta chamada app: mkdir app
+                    entrar na pasta app: cd app
+                    clonar a aplicação do github e salvar em uma pasta serve: git clone https://github.com/fabriciodw/testeOcean server
+                    entrar na pasta sever e rodar o npm: npm install
+                copiar o arquivo .env.examplo cp .env.examplo .env
+
+
+
+-------------------------- iniciando APP da estufa ----------------------------------------------------------------
+        yarn add --global expo cli
+         - expo init "nome do app"
+         - abrir a pasta no terminal
+        yarn add express --save 
+        yarn add cors --save
+        yarn add sequelize
+        yarn add mysql2
+        yarn add sequelize-cli
+        yarn add nodemon
+        yarn add @react-navigation/native
+        expo install react-native-screens react-native-safe-area-context
+        yarn add @react-navigation/stack
+        expo install @react-native-masked-view/masked-view
+        yarn add react-native-gesture-handler
+        yarn add react-native-vector-icons
+        yarn add react-native-elements
+
+
+
+
+
+
+
+
+
